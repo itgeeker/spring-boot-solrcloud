@@ -1,6 +1,11 @@
 spring:
   data:
     solr:
-      zk-host: 192.168.18.140:2181,192.168.18.145:2181,192.168.18.147:2181
-      repositories:
-        enabled: true
+      zk:
+        host: 192.168.18.140:2181,192.168.18.145:2181,192.168.18.147:2181
+        client:
+          timeout: 30000
+        connect:
+          timeout: 30000
+          maxConnections: 300
+      defaultCollection: goodslist_1

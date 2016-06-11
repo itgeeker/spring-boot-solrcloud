@@ -4,6 +4,7 @@ import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.solr.core.mapping.Indexed;
 import org.springframework.data.solr.core.mapping.SolrDocument;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
  * @Author huangzhiwei
  * @DATE 2016/6/3
  */
-public class Product {
+public class Product implements Serializable{
     //商品ID
     @Field
     @Indexed

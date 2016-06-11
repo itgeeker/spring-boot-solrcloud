@@ -11,4 +11,5 @@ import org.springframework.data.solr.repository.SolrCrudRepository;
  * @DATE 2016/6/7
  */
 public interface ProductRepository extends SolrCrudRepository<Product,String> {
+    Product findByName(String name);
 }
