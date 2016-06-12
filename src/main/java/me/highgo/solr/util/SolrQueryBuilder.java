@@ -45,8 +45,8 @@ public class SolrQueryBuilder {
 
         buildSolrpagination(solrQuery,goodsParam);
 
-        String fl = buildSolrFL();
-        solrQuery.set(CommonParams.FL,fl);
+//        String fl = buildSolrFL();
+//        solrQuery.set(CommonParams.FL,fl);
 
         solrQuery.set(CommonParams.WT,"json");
 
@@ -89,10 +89,6 @@ public class SolrQueryBuilder {
             }
 
             // 查询库存大于0（true） false 查询全部
-            if (goodsParam.getInStock()) {
-                fq = joinFQ(fq,"goodsInventory:"+goodsParam.getGoodsTransfee());
-            }
-
             if (goodsParam.getInStock()) {
                 fq = joinFQ(fq,"goodsInventory:[1 TO *]");
             }

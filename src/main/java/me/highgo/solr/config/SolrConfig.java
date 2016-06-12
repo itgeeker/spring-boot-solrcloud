@@ -12,6 +12,8 @@ import org.springframework.core.env.PropertyResolver;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 
+import javax.annotation.PostConstruct;
+
 /**
  * SolrConfig.java
  *
@@ -38,6 +40,10 @@ public class SolrConfig implements EnvironmentAware{
     public static String defaultCollection;
 
     public SolrConfig() {
+    }
+
+    @PostConstruct
+    public void init(){
         zkHost = propResolver.getProperty("spring.data.solr.zk.host");
         zkClientTimeout = Integer.valueOf(propResolver.getProperty("spring.data.solr.zk.client.timeout"));
         zkConnectTimeout = Integer.valueOf(propResolver.getProperty("spring.data.solr.zk.connect.timeout"));

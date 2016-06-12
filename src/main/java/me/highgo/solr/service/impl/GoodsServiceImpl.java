@@ -11,6 +11,7 @@ import me.highgo.solr.util.SolrQueryBuilder;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ import java.util.List;
  * @Author huangzhiwei
  * @DATE 2016/6/11
  */
+@Service
 public class GoodsServiceImpl implements GoodsService {
     @Override
     public Page<GoodsFront> queryGoodsList(GoodsParam goodsParam) throws Exception {

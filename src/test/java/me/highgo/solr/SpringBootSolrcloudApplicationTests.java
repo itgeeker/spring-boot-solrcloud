@@ -1,24 +1,24 @@
 package me.highgo.solr;
 
-import me.highgo.solr.model.GoodsParam;
-import me.highgo.solr.model.GoodsProperty;
-import me.highgo.solr.model.OrderEnum;
-import me.highgo.solr.model.Product;
+import me.highgo.solr.model.*;
 import me.highgo.solr.repository.ProductRepository;
+import me.highgo.solr.service.GoodsService;
+import me.highgo.solr.util.CloudSolrServerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.params.CommonParams;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -28,11 +28,14 @@ public class SpringBootSolrcloudApplicationTests {
 	@Autowired
 	private ProductRepository productRepository;
 
-	@Autowired
-	private SolrTemplate solrTemplate;
+//	@Autowired
+//	private SolrTemplate solrTemplate;
 
 	@Autowired
 	private HttpSolrServer httpSolrServer;
+
+	@Autowired
+	private GoodsService goodsService;
 
 	@Test
 	public void contextLoads() {
@@ -47,6 +50,56 @@ public class SpringBootSolrcloudApplicationTests {
 //		Product product = productRepository.findByName("家天下达贺第二代洗头刷洗发梳6658");
 		Product product = productRepository.findByName("洗发梳");
 		System.out.println(product);
+	}
+
+	@Test
+	/**
+	 * 重构后的商品列表查询
+	 */
+	public void testQueryGoodsList() throws Exception {
+		GoodsParam goodsParam = new GoodsParam();
+		List<Long> gcIds = new ArrayList<>();
+		gcIds.add(10l);
+
+		//添加商品分类
+		goodsParam.setGcIdList(gcIds);
+		//货到付款
+		goodsParam.setGoodsCod(0);
+		//卖家承担运费
+		goodsParam.setGoodsTransfee(1);
+		//设置排序
+		ArrayList<OrderEnum> orderEnumList = new ArrayList();
+		orderEnumList.add(OrderEnum.SUPPORTTOP); //默认排序
+		goodsParam.setOrderEnumList(orderEnumList);
+		//只显示有货
+		goodsParam.setInStock(true);
+		goodsParam.setGoodsType(1);
+		goodsParam.setStart(0);
+		goodsParam.setRows(10);
+
+		Page<GoodsFront> goodsFrontPage = goodsService.queryGoodsList(goodsParam);
+		System.out.println("查询完毕");
+	}
+
+	@Test
+	public void testFacetQuery() throws SolrServerException {
+		SolrQuery solrQuery = new SolrQuery();
+		solrQuery.set(CommonParams.Q,"goodsStatus:0 AND showStatus:1 AND -paymentMethod:2 AND -industryMark:JIAZE AND -industryMark:JIAZA");
+		solrQuery.set(CommonParams.FQ,"gcId:");//564 手机id
+		solrQuery.setFacet(true); //开启Facet
+		solrQuery.addFacetField("goodsProperty");
+		solrQuery.setFacetMinCount(2); //获取重复数量大于2
+		solrQuery.setFacetLimit(15);
+		solrQuery.setFacetSort("count");
+
+		CloudSolrServer cloudSolrServer = CloudSolrServerFactory.getInstance().getCloudSolrServer();
+		QueryResponse response = cloudSolrServer.query(solrQuery);
+		List<FacetField> facetFields = response.getFacetFields();
+		for (FacetField facet : facetFields){
+			List<FacetField.Count> facetValues = facet.getValues();
+			for (FacetField.Count count : facetValues)
+				System.out.println(count.getName()+"数量"+count.getCount());
+		}
 	}
 
 	@Test

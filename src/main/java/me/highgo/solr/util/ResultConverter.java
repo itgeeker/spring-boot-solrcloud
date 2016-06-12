@@ -46,6 +46,7 @@ public class ResultConverter {
                         goodsFront.setGoodsPhotoList(Arrays.asList(goodsPhotoArray));
                     }
                 }
+                goodsFrontList.add(goodsFront);
             }
             return goodsFrontList;
         }
